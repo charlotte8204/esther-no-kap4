@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sida 5: Fotosyntes - Esther</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Verdana, Geneva, sans-serif;
+            font-size: 18px;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #f5f0ff 0%, #e8f5e9 100%);
+            min-height: 100vh;
+            color: #2d3436;
+        }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 220px; background: white; padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            position: fixed; height: 100vh; overflow-y: auto;
+        }
+        .sidebar h3 { color: #6c5ce7; font-size: 16px; margin-bottom: 15px; }
+        .nav-link {
+            display: block; padding: 8px 12px; margin-bottom: 4px;
+            border-radius: 8px; text-decoration: none; color: #636e72; font-size: 14px;
+        }
+        .nav-link:hover { background: #f0f0f0; }
+        .nav-link.current { background: #e8f5e9; color: #00695c; font-weight: bold; }
+        .nav-link.completed::before { content: "✓ "; color: #27ae60; }
+        .main { flex: 1; margin-left: 220px; padding: 30px; max-width: 800px; }
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #eee;
+        }
+        .progress-indicator { font-size: 14px; color: #888; }
+        .top-right { display: flex; gap: 15px; align-items: center; }
+        .points-display {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            padding: 8px 16px; border-radius: 20px; font-weight: bold; color: #856404;
+        }
+        .pause-btn {
+            background: #dfe6e9; border: none; padding: 10px 20px;
+            border-radius: 20px; cursor: pointer; font-size: 14px; color: #636e72;
+        }
+        .content-card {
+            background: white; border-radius: 20px; padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;
+        }
+        .page-title { color: #6c5ce7; font-size: 24px; margin-bottom: 20px; }
+        .concept-box {
+            background: #e8f4fd; border-left: 4px solid #74b9ff;
+            padding: 15px 20px; border-radius: 0 12px 12px 0; margin: 20px 0;
+        }
+        .fact-box {
+            background: #e8f5e9; border-left: 4px solid #a8e6cf;
+            padding: 15px 20px; border-radius: 0 12px 12px 0; margin: 20px 0;
+        }
+        .formula-box {
+            background: #f8f9fa;
+            border: 2px solid #6c5ce7;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 16px;
+        }
+        .formula-box .arrow { color: #6c5ce7; font-size: 24px; margin: 0 10px; }
+        .task-section {
+            background: #f8f9fa; border-radius: 16px; padding: 25px; margin-top: 30px;
+        }
+        .task-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+        }
+        .task-title { font-size: 18px; color: #2d3436; }
+        .task-level { font-size: 12px; padding: 4px 10px; border-radius: 10px; background: #81ecec; color: #00695c; }
+
+        /* Dra och släpp */
+        .equation-builder {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 2px dashed #ddd;
+            min-height: 80px;
+            margin: 15px 0;
+        }
+        .equation-slot {
+            min-width: 100px;
+            height: 50px;
+            border: 2px dashed #74b9ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+        .equation-slot.filled {
+            border-style: solid;
+            background: #e8f4fd;
+        }
+        .equation-symbol {
+            font-size: 24px;
+            color: #6c5ce7;
+            font-weight: bold;
+        }
+        .drag-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .drag-item {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #a8e6cf, #81ecec);
+            border-radius: 10px;
+            cursor: grab;
+            font-weight: bold;
+            color: #00695c;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+        .drag-item:hover { transform: scale(1.05); }
+        .drag-item.used { opacity: 0.4; cursor: not-allowed; }
+
+        .check-btn {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white; border: none; padding: 12px 30px; border-radius: 25px;
+            font-size: 16px; cursor: pointer; margin-top: 20px;
+        }
+        .feedback { margin-top: 20px; padding: 15px 20px; border-radius: 12px; display: none; }
+        .feedback.correct { background: #d4edda; color: #155724; display: block; }
+        .feedback.incorrect { background: #fff3cd; color: #856404; display: block; }
+        .hints-section { margin-top: 20px; }
+        .hint-btn {
+            background: #ffeaa7; border: none; padding: 10px 20px;
+            border-radius: 20px; cursor: pointer; font-size: 14px; color: #856404;
+        }
+        .hint-text { background: #fff9e6; padding: 15px; border-radius: 12px; margin-top: 10px; display: none; }
+        .hint-text.show { display: block; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; }
+        .nav-btn { padding: 15px 30px; border-radius: 25px; text-decoration: none; font-size: 16px; }
+        .nav-btn.prev { background: #dfe6e9; color: #636e72; }
+        .nav-btn.next { background: linear-gradient(135deg, #a8e6cf, #81ecec); color: #00695c; font-weight: bold; }
+        .nav-btn.next.locked { background: #ddd; color: #999; pointer-events: none; }
+        .skip-btn {
+            background: transparent; border: 2px solid #ddd; padding: 15px 25px;
+            border-radius: 25px; color: #888; cursor: pointer; font-size: 14px;
+        }
+        .success-message { text-align: center; padding: 20px; display: none; }
+        .success-message.show { display: block; }
+        .success-message h3 { color: #27ae60; font-size: 22px; margin-bottom: 10px; }
+        .points-earned { font-size: 18px; color: #f39c12; font-weight: bold; }
+        .already-completed { background: #d4edda; border: 2px solid #81c784; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .already-completed h4 { color: #155724; margin-bottom: 10px; }
+        .already-completed .redo-btn { background: transparent; border: 2px solid #81c784; padding: 8px 20px; border-radius: 20px; color: #155724; cursor: pointer; margin-top: 15px; font-size: 14px; }
+        .already-completed .redo-btn:hover { background: #81c784; color: white; }
+        .pause-modal {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .pause-modal.show { display: flex; }
+        .pause-content { background: white; padding: 40px; border-radius: 20px; text-align: center; }
+        .continue-btn {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white; border: none; padding: 15px 40px; border-radius: 25px; font-size: 18px; cursor: pointer;
+        }
+        .text-size-controls { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 5px; }
+        .size-btn {
+            width: 40px; height: 40px; border: 2px solid #ddd; border-radius: 50%;
+            background: white; cursor: pointer; font-size: 16px;
+        }
+
+        /* === STICKY NOTES HÖGERMARGINALEN === */
+        .sticky-sidebar {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 190px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sticky-note {
+            border-radius: 5px;
+            padding: 16px 14px;
+            box-shadow:
+                3px 3px 10px rgba(0,0,0,0.1),
+                0 0 0 1px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .sticky-note::before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 15px;
+            border-radius: 2px;
+        }
+
+        .sticky-note-yellow {
+            background: #fffacd;
+            transform: rotate(-2deg);
+        }
+
+        .sticky-note-yellow::before {
+            background: rgba(200, 180, 140, 0.6);
+        }
+
+        .sticky-note-pink {
+            background: #ffe4ec;
+            transform: rotate(2deg);
+        }
+
+        .sticky-note-pink::before {
+            background: rgba(200, 150, 170, 0.6);
+        }
+
+        .sticky-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sticky-note-yellow .sticky-title {
+            color: #7a6a4a;
+        }
+
+        .sticky-note-pink .sticky-title {
+            color: #7a4a5a;
+        }
+
+        .sticky-list {
+            list-style: none;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .sticky-note-yellow .sticky-list {
+            color: #6a5a3a;
+        }
+
+        .sticky-note-pink .sticky-list {
+            color: #6a3a4a;
+        }
+
+        .sticky-list li {
+            padding: 3px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .sticky-color-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            top: 7px;
+        }
+
+        .sticky-note-pink .sticky-list li::before {
+            content: "\01F4A1";
+            position: absolute;
+            left: 0;
+            font-size: 9px;
+        }
+
+        @media (max-width: 1200px) {
+            .sticky-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY NOTES HÖGERMARGINALEN -->
+    <aside class="sticky-sidebar">
+        <div class="sticky-note sticky-note-yellow">
+            <div class="sticky-title">Så här fungerar färgerna</div>
+            <ul class="sticky-list">
+                <li><span class="sticky-color-dot" style="background:#74b9ff"></span> Blå = Viktiga begrepp</li>
+                <li><span class="sticky-color-dot" style="background:#a8e6cf"></span> Grön = Fakta att komma ihåg</li>
+                <li><span class="sticky-color-dot" style="background:#ffcccc"></span> Röd = Förväxla inte!</li>
+                <li><span class="sticky-color-dot" style="background:#ffeaa7"></span> Gul = Visste du att...</li>
+            </ul>
+        </div>
+        <div class="sticky-note sticky-note-pink">
+            <div class="sticky-title">Tips till Esther</div>
+            <ul class="sticky-list">
+                <li>Ha papper och penna bredvid dig</li>
+                <li>Läs instruktionerna klart först</li>
+                <li>Ta paus var 20:e minut</li>
+                <li>Det är okej att göra fel!</li>
+            </ul>
+        </div>
+    </aside>
+
+    <div class="layout">
+        <nav class="sidebar">
+            <h3>Del 1: Bränslen och kol</h3>
+            <a href="del1-sida01.html" class="nav-link">1. Vad är bränsle?</a>
+            <a href="del1-sida02.html" class="nav-link">2. Grundämnet kol</a>
+            <a href="del1-sida03.html" class="nav-link">3. Kol i allt levande</a>
+            <a href="del1-sida04.html" class="nav-link">4. Kolets kretslopp</a>
+            <a href="del1-sida05.html" class="nav-link current">5. Fotosyntes</a>
+            <a href="del1-sida06.html" class="nav-link">6. Cellandning</a>
+            <a href="del1-sida07.html" class="nav-link">7. Allt hänger ihop</a>
+            <a href="del1-sida08.html" class="nav-link">8. Nedbrytare</a>
+            <a href="del1-sida09.html" class="nav-link">9. Sammanfattning</a>
+            <div style="margin-top: 30px;">
+                <a href="index.html" class="nav-link" style="color: #6c5ce7;">← Tillbaka till start</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="top-bar">
+                <div class="progress-indicator">Sida 5 av 23 • Del 1</div>
+                <div class="top-right">
+                    <div class="points-display">⭐ <span id="totalPoints">0</span> poäng</div>
+                    <button class="pause-btn" onclick="showPause()">Jag behöver en paus</button>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h1 class="page-title">Fotosyntes</h1>
+
+                <p>Hur tar växterna upp koldioxid och vad gör de med den? Det kallas <strong>fotosyntes</strong>!</p>
+
+                <div class="concept-box">
+                    <p><strong>Fotosyntes</strong> = när växter använder koldioxid, vatten och solenergi för att skapa druvsocker och syre.</p>
+                </div>
+
+                <div class="formula-box">
+                    <strong>Koldioxid</strong> + <strong>Vatten</strong> + <strong>Solenergi</strong>
+                    <span class="arrow">→</span>
+                    <strong>Druvsocker</strong> + <strong>Syre</strong>
+                </div>
+
+                <!-- SVG: Fotosyntes visualiserad -->
+                <div style="text-align: center; margin: 25px 0;">
+                    <svg viewBox="0 0 400 300" style="max-width: 400px; width: 100%;">
+                        <!-- Bakgrund -->
+                        <rect x="0" y="0" width="400" height="300" fill="#f0fff0" rx="15"/>
+
+                        <!-- Titel -->
+                        <text x="200" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#27ae60">Fotosyntes i växten</text>
+
+                        <!-- Sol (överst höger) -->
+                        <circle cx="340" cy="70" r="30" fill="#ffeaa7" stroke="#f39c12" stroke-width="2"/>
+                        <!-- Solstrålar -->
+                        <line x1="340" y1="30" x2="340" y2="15" stroke="#f39c12" stroke-width="3"/>
+                        <line x1="365" y1="45" x2="378" y2="35" stroke="#f39c12" stroke-width="3"/>
+                        <line x1="380" y1="70" x2="395" y2="70" stroke="#f39c12" stroke-width="3"/>
+                        <line x1="365" y1="95" x2="378" y2="105" stroke="#f39c12" stroke-width="3"/>
+                        <text x="340" y="75" text-anchor="middle" font-size="10" fill="#856404" font-weight="bold">Sol</text>
+
+                        <!-- Träd/Växt (mitten) -->
+                        <!-- Stam -->
+                        <rect x="185" y="180" width="30" height="70" fill="#8B4513" rx="3"/>
+                        <!-- Krona -->
+                        <ellipse cx="200" cy="140" rx="60" ry="50" fill="#a8e6cf" stroke="#27ae60" stroke-width="2"/>
+                        <ellipse cx="170" cy="160" rx="35" ry="30" fill="#81ecec" stroke="#00b894" stroke-width="2"/>
+                        <ellipse cx="230" cy="160" rx="35" ry="30" fill="#81ecec" stroke="#00b894" stroke-width="2"/>
+                        <text x="200" y="135" text-anchor="middle" font-size="11" fill="#00695c" font-weight="bold">VÄXT</text>
+                        <text x="200" y="150" text-anchor="middle" font-size="8" fill="#00695c">(bladen)</text>
+
+                        <!-- Mark -->
+                        <rect x="0" y="250" width="400" height="50" fill="#c4a77d" rx="0"/>
+                        <ellipse cx="200" cy="250" rx="80" ry="10" fill="#8B4513" opacity="0.3"/>
+
+                        <!-- Vänster: Inputs -->
+                        <!-- Koldioxid (moln) -->
+                        <ellipse cx="50" cy="80" rx="35" ry="20" fill="#dfe6e9" stroke="#636e72" stroke-width="2"/>
+                        <ellipse cx="35" cy="90" rx="20" ry="15" fill="#dfe6e9" stroke="#636e72" stroke-width="1"/>
+                        <ellipse cx="65" cy="90" rx="20" ry="15" fill="#dfe6e9" stroke="#636e72" stroke-width="1"/>
+                        <text x="50" y="78" text-anchor="middle" font-size="9" fill="#2d3436" font-weight="bold">CO₂</text>
+                        <text x="50" y="90" text-anchor="middle" font-size="7" fill="#636e72">(koldioxid)</text>
+
+                        <!-- Vatten (droppar vid rötterna) -->
+                        <path d="M 80 260 Q 75 275 80 285 Q 85 275 80 260" fill="#74b9ff" stroke="#0984e3" stroke-width="1"/>
+                        <path d="M 100 265 Q 95 278 100 288 Q 105 278 100 265" fill="#74b9ff" stroke="#0984e3" stroke-width="1"/>
+                        <text x="90" y="298" text-anchor="middle" font-size="8" fill="#0047ab" font-weight="bold">Vatten</text>
+
+                        <!-- Pilar IN -->
+                        <defs>
+                            <marker id="arrowIn" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#27ae60"/>
+                            </marker>
+                            <marker id="arrowOut" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#6c5ce7"/>
+                            </marker>
+                            <marker id="arrowSun" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#f39c12"/>
+                            </marker>
+                        </defs>
+
+                        <!-- Pil från CO₂ -->
+                        <path d="M 85 85 Q 110 100 135 120" stroke="#27ae60" stroke-width="3" fill="none" marker-end="url(#arrowIn)"/>
+
+                        <!-- Pil från sol -->
+                        <path d="M 305 85 Q 280 100 265 120" stroke="#f39c12" stroke-width="3" fill="none" marker-end="url(#arrowSun)"/>
+
+                        <!-- Pil från vatten (upp genom stammen) -->
+                        <path d="M 120 270 Q 150 240 185 220" stroke="#74b9ff" stroke-width="2" fill="none" marker-end="url(#arrowIn)"/>
+
+                        <!-- Höger: Outputs -->
+                        <!-- Druvsocker (i växten) -->
+                        <rect x="280" y="180" width="55" height="35" rx="8" fill="#ffeaa7" stroke="#f39c12" stroke-width="2"/>
+                        <text x="307" y="195" text-anchor="middle" font-size="8" fill="#856404" font-weight="bold">Druvsocker</text>
+                        <text x="307" y="207" text-anchor="middle" font-size="7" fill="#856404">(mat/energi)</text>
+
+                        <!-- Syre (bubbla/moln) -->
+                        <ellipse cx="320" cy="130" rx="30" ry="20" fill="#e8f4fd" stroke="#74b9ff" stroke-width="2"/>
+                        <text x="320" y="127" text-anchor="middle" font-size="9" fill="#0047ab" font-weight="bold">O₂</text>
+                        <text x="320" y="140" text-anchor="middle" font-size="7" fill="#0047ab">(syre)</text>
+
+                        <!-- Pilar UT -->
+                        <!-- Pil till druvsocker -->
+                        <path d="M 245 170 Q 260 175 275 185" stroke="#6c5ce7" stroke-width="3" fill="none" marker-end="url(#arrowOut)"/>
+
+                        <!-- Pil till syre (ut från bladen) -->
+                        <path d="M 255 140 Q 270 135 285 130" stroke="#6c5ce7" stroke-width="3" fill="none" marker-end="url(#arrowOut)"/>
+
+                        <!-- Legend nere -->
+                        <text x="200" y="245" text-anchor="middle" font-size="9" fill="#27ae60" font-style="italic">Växten gör mat av solljus!</text>
+                    </svg>
+                </div>
+
+                <div class="fact-box">
+                    <p><strong>Kom ihåg:</strong></p>
+                    <p>• Växterna TAR IN: koldioxid, vatten, solenergi</p>
+                    <p>• Växterna GER UT: druvsocker (mat), syre</p>
+                </div>
+
+                <div class="task-section">
+                    <div class="already-completed" id="alreadyCompleted" style="display: none;">
+                        <h4>Du har redan svarat på denna sida!</h4>
+                        <p>Du klarade att bygga fotosyntesen korrekt.</p>
+                        <button class="redo-btn" onclick="redoTask()">Gör om uppgiften</button>
+                    </div>
+                    <div id="taskContent">
+                    <div class="task-header">
+                        <span class="task-title">Bygg fotosyntesen</span>
+                        <span class="task-level">Nivå C</span>
+                    </div>
+
+                    <p style="margin-bottom: 15px;">Klicka på rätt ämnen och placera dem på rätt plats. Vad tar växten in? Vad ger den ut?</p>
+
+                    <p><strong>Växten tar in:</strong></p>
+                    <div class="equation-builder" id="inputZone">
+                        <div class="equation-slot" data-expects="koldioxid" onclick="removeFromSlot(this)"></div>
+                        <span class="equation-symbol">+</span>
+                        <div class="equation-slot" data-expects="vatten" onclick="removeFromSlot(this)"></div>
+                        <span class="equation-symbol">+</span>
+                        <div class="equation-slot" data-expects="solenergi" onclick="removeFromSlot(this)"></div>
+                    </div>
+
+                    <p><strong>Växten ger ut:</strong></p>
+                    <div class="equation-builder" id="outputZone">
+                        <div class="equation-slot" data-expects="druvsocker" onclick="removeFromSlot(this)"></div>
+                        <span class="equation-symbol">+</span>
+                        <div class="equation-slot" data-expects="syre" onclick="removeFromSlot(this)"></div>
+                    </div>
+
+                    <p style="margin-top: 20px;"><strong>Klicka för att välja:</strong></p>
+                    <div class="drag-options" id="options">
+                        <div class="drag-item" data-value="koldioxid" onclick="selectItem(this)">Koldioxid</div>
+                        <div class="drag-item" data-value="vatten" onclick="selectItem(this)">Vatten</div>
+                        <div class="drag-item" data-value="syre" onclick="selectItem(this)">Syre</div>
+                        <div class="drag-item" data-value="solenergi" onclick="selectItem(this)">Solenergi</div>
+                        <div class="drag-item" data-value="druvsocker" onclick="selectItem(this)">Druvsocker</div>
+                    </div>
+
+                    <div class="hints-section">
+                        <button class="hint-btn" onclick="showHint(1)">Ledtråd</button>
+                        <div class="hint-text" id="hint1">
+                            <p>Titta på den lila rutan ovanför. Vad står det före pilen? Vad står det efter?</p>
+                        </div>
+                    </div>
+
+                    <button class="check-btn" onclick="checkAnswer()">Kolla svaret</button>
+
+                    <div class="feedback" id="feedback"></div>
+
+                    <div class="success-message" id="success">
+                        <h3>Suveränt, Esther!</h3>
+                        <p class="points-earned">+10 poäng</p>
+                    </div>
+                    </div><!-- /taskContent -->
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="del1-sida04.html" class="nav-btn prev">← Föregående</a>
+                <button class="skip-btn" onclick="skipPage()">Hoppa över</button>
+                <a href="del1-sida06.html" class="nav-btn next locked" id="nextBtn">Nästa →</a>
+            </div>
+        </main>
+    </div>
+
+    <div class="pause-modal" id="pauseModal">
+        <div class="pause-content">
+            <h2>Paus!</h2>
+            <p>Du har redan klarat 5 sidor! Imponerande!</p>
+            <button class="continue-btn" onclick="hidePause()">Fortsätt</button>
+        </div>
+    </div>
+
+    <div class="text-size-controls">
+        <button class="size-btn" onclick="changeSize(-2)">A-</button>
+        <button class="size-btn" onclick="changeSize(2)">A+</button>
+    </div>
+
+    <script>
+        const pageData = {
+            pageId: 'del1-sida05.html',
+            startTime: Date.now(),
+            attempts: 0,
+            hintsUsed: 0
+        };
+
+        let selectedItem = null;
+
+        function loadPoints() {
+            const points = localStorage.getItem('esther-no-kap4-points');
+            document.getElementById('totalPoints').textContent = points ? points : '0';
+        }
+        loadPoints();
+
+        function loadSavedAnswer() {
+            const savedAnswer = localStorage.getItem('esther-no-kap4-answer-' + pageData.pageId);
+            const progress = JSON.parse(localStorage.getItem('esther-no-kap4-progress') || '{}');
+            if (savedAnswer && progress[pageData.pageId] === 'completed') {
+                document.getElementById('alreadyCompleted').style.display = 'block';
+                document.getElementById('taskContent').style.display = 'none';
+                document.getElementById('nextBtn').classList.remove('locked');
+            }
+        }
+        loadSavedAnswer();
+
+        function redoTask() {
+            document.getElementById('alreadyCompleted').style.display = 'none';
+            document.getElementById('taskContent').style.display = 'block';
+            document.querySelectorAll('.equation-slot').forEach(slot => {
+                slot.textContent = '';
+                slot.dataset.value = '';
+                slot.classList.remove('filled');
+            });
+            document.querySelectorAll('.drag-item').forEach(item => item.classList.remove('used'));
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('success').classList.remove('show');
+        }
+
+        function selectItem(element) {
+            if (element.classList.contains('used')) return;
+
+            // Ta bort tidigare val
+            document.querySelectorAll('.drag-item').forEach(item => {
+                item.style.outline = 'none';
+            });
+
+            element.style.outline = '3px solid #6c5ce7';
+            selectedItem = element;
+
+            // Hitta första tomma slot
+            const emptySlot = document.querySelector('.equation-slot:not(.filled)');
+            if (emptySlot) {
+                placeInSlot(emptySlot);
+            }
+        }
+
+        function placeInSlot(slot) {
+            if (!selectedItem || slot.classList.contains('filled')) return;
+
+            slot.textContent = selectedItem.textContent;
+            slot.dataset.value = selectedItem.dataset.value;
+            slot.classList.add('filled');
+            selectedItem.classList.add('used');
+            selectedItem.style.outline = 'none';
+            selectedItem = null;
+        }
+
+        function removeFromSlot(slot) {
+            if (!slot.classList.contains('filled')) return;
+
+            const value = slot.dataset.value;
+            const option = document.querySelector(`.drag-item[data-value="${value}"]`);
+            if (option) option.classList.remove('used');
+
+            slot.textContent = '';
+            slot.dataset.value = '';
+            slot.classList.remove('filled');
+        }
+
+        function showHint(num) {
+            pageData.hintsUsed = num;
+            document.getElementById('hint' + num).classList.add('show');
+        }
+
+        function checkAnswer() {
+            pageData.attempts++;
+            const slots = document.querySelectorAll('.equation-slot');
+            let allCorrect = true;
+
+            slots.forEach(slot => {
+                if (slot.dataset.value !== slot.dataset.expects) {
+                    allCorrect = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+
+            if (allCorrect) {
+                let points = pageData.hintsUsed > 0 ? 5 : 10;
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = '<strong>Perfekt!</strong> Växten tar in koldioxid, vatten och solenergi. Den ger ut druvsocker och syre!';
+
+                document.getElementById('success').classList.add('show');
+                document.querySelector('.points-earned').textContent = '+' + points + ' poäng';
+
+                const currentPoints = parseInt(localStorage.getItem('esther-no-kap4-points') || '0');
+                localStorage.setItem('esther-no-kap4-points', currentPoints + points);
+                document.getElementById('totalPoints').textContent = currentPoints + points;
+
+                localStorage.setItem('esther-no-kap4-answer-' + pageData.pageId, 'korrekt');
+                document.getElementById('nextBtn').classList.remove('locked');
+                markCompleted();
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = 'Inte helt rätt. Titta på formeln i den lila rutan. Klicka på en ifylld ruta för att ta bort den och försök igen.';
+            }
+        }
+
+        function skipPage() {
+            const progress = JSON.parse(localStorage.getItem('esther-no-kap4-progress') || '{}');
+            progress[pageData.pageId] = 'skipped';
+            localStorage.setItem('esther-no-kap4-progress', JSON.stringify(progress));
+            window.location.href = 'del1-sida06.html';
+        }
+
+        function markCompleted() {
+            const progress = JSON.parse(localStorage.getItem('esther-no-kap4-progress') || '{}');
+            progress[pageData.pageId] = 'completed';
+            localStorage.setItem('esther-no-kap4-progress', JSON.stringify(progress));
+        }
+
+        function showPause() { document.getElementById('pauseModal').classList.add('show'); }
+        function hidePause() { document.getElementById('pauseModal').classList.remove('show'); }
+        function changeSize(delta) {
+            const currentSize = parseInt(window.getComputedStyle(document.body).fontSize);
+            document.body.style.fontSize = (currentSize + delta) + 'px';
+        }
+
+        function updateSidebar() {
+            const progress = JSON.parse(localStorage.getItem('esther-no-kap4-progress') || '{}');
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (progress[href] === 'completed') link.classList.add('completed');
+            });
+        }
+        updateSidebar();
+    </script>
+</body>
+</html>

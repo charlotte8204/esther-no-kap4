@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sida 9: Sammanfattning Del 1 - Esther</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Verdana, Geneva, sans-serif;
+            font-size: 18px;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #f5f0ff 0%, #e8f5e9 100%);
+            min-height: 100vh;
+            color: #2d3436;
+        }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 220px; background: white; padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            position: fixed; height: 100vh; overflow-y: auto;
+        }
+        .sidebar h3 { color: #6c5ce7; font-size: 16px; margin-bottom: 15px; }
+        .nav-link {
+            display: block; padding: 8px 12px; margin-bottom: 4px;
+            border-radius: 8px; text-decoration: none; color: #636e72; font-size: 14px;
+        }
+        .nav-link:hover { background: #f0f0f0; }
+        .nav-link.current { background: #e8f5e9; color: #00695c; font-weight: bold; }
+        .nav-link.completed::before { content: "✓ "; color: #27ae60; }
+        .main { flex: 1; margin-left: 220px; padding: 30px; max-width: 800px; }
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #eee;
+        }
+        .progress-indicator { font-size: 14px; color: #888; }
+        .top-right { display: flex; gap: 15px; align-items: center; }
+        .points-display {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            padding: 8px 16px; border-radius: 20px; font-weight: bold; color: #856404;
+        }
+        .pause-btn {
+            background: #dfe6e9; border: none; padding: 10px 20px;
+            border-radius: 20px; cursor: pointer; font-size: 14px; color: #636e72;
+        }
+        .content-card {
+            background: white; border-radius: 20px; padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;
+        }
+        .page-title { color: #6c5ce7; font-size: 24px; margin-bottom: 20px; }
+        .celebration {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #a8e6cf, #81ecec);
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        .celebration h2 {
+            color: #00695c;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .celebration p {
+            color: #00695c;
+        }
+        .summary-box {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .summary-box h3 {
+            color: #6c5ce7;
+            margin-bottom: 15px;
+        }
+        .summary-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+        }
+        .summary-icon {
+            width: 30px;
+            height: 30px;
+            background: #e8f4fd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .task-section {
+            background: #fff9e6; border-radius: 16px; padding: 25px; margin-top: 30px;
+        }
+        .task-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+        }
+        .task-title { font-size: 18px; color: #2d3436; }
+        .reflection-question {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .reflection-question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .reflection-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .reflection-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .reflection-btn:hover {
+            border-color: #6c5ce7;
+            background: #f8f5ff;
+        }
+        .reflection-btn.selected {
+            border-color: #6c5ce7;
+            background: #e8f4fd;
+        }
+        .continue-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .continue-btn-main {
+            display: inline-block;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .continue-btn-main:hover {
+            transform: scale(1.05);
+        }
+        .continue-btn-main.locked {
+            background: #ddd;
+            color: #999;
+            pointer-events: none;
+        }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; }
+        .nav-btn { padding: 15px 30px; border-radius: 25px; text-decoration: none; font-size: 16px; }
+        .nav-btn.prev { background: #dfe6e9; color: #636e72; }
+        .skip-btn {
+            background: transparent; border: 2px solid #ddd; padding: 15px 25px;
+            border-radius: 25px; color: #888; cursor: pointer; font-size: 14px;
+        }
+
+        /* === LÄRANDE SOM STANNAR === */
+        .screen-off-challenge {
+            background: linear-gradient(135deg, #ffeef8, #ffe4ec);
+            border: 2px solid #fd79a8;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .screen-off-challenge h3 { color: #e84393; margin-bottom: 15px; }
+        .screen-off-challenge p { margin-bottom: 10px; color: #6c5ce7; }
+        .challenge-btn {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+            color: white; border: none; padding: 12px 30px; border-radius: 25px;
+            font-size: 16px; cursor: pointer; margin-top: 15px;
+        }
+        .screen-off-done {
+            background: #d4edda; border: 2px solid #81c784; border-radius: 12px;
+            padding: 20px; margin-bottom: 25px; text-align: center; color: #155724;
+        }
+
+        .paper-prompt {
+            background: #fff9e6; border: 2px solid #ffeaa7; border-radius: 12px;
+            padding: 20px; margin: 20px 0; text-align: center;
+        }
+        .paper-prompt h4 { color: #856404; margin-bottom: 10px; }
+        .paper-btn {
+            background: #ffeaa7; border: 2px solid #f39c12; padding: 10px 25px;
+            border-radius: 20px; color: #856404; cursor: pointer; font-size: 14px; margin-top: 10px;
+        }
+        .paper-done { background: #d4edda; color: #155724; display: none; margin-top: 10px; padding: 10px; border-radius: 8px; }
+
+        .self-quiz { background: #e8f4fd; border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .self-quiz h3 { color: #0984e3; margin-bottom: 10px; }
+        .self-quiz-note { font-style: italic; color: #636e72; margin-bottom: 20px; font-size: 14px; }
+        .quiz-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .quiz-question-text { font-weight: bold; margin-bottom: 10px; }
+        .quiz-input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 10px; }
+        .reveal-btn { background: #74b9ff; border: none; padding: 8px 20px; border-radius: 15px; color: white; cursor: pointer; font-size: 14px; }
+        .quiz-answer { display: none; background: #d4edda; padding: 10px; border-radius: 8px; margin-top: 10px; color: #155724; }
+        .quiz-answer.show { display: block; }
+
+        .quick-quiz-section { background: linear-gradient(135deg, #a29bfe, #6c5ce7); border-radius: 16px; padding: 25px; margin: 25px 0; color: white; }
+        .quick-quiz-section h3 { margin-bottom: 10px; }
+        .start-quiz-btn { background: white; color: #6c5ce7; border: none; padding: 15px 35px; border-radius: 25px; font-size: 18px; cursor: pointer; font-weight: bold; }
+        .quick-quiz-content { display: none; margin-top: 20px; }
+        .timer-display { font-size: 24px; font-weight: bold; margin-bottom: 15px; }
+        .quick-quiz-question { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .quick-quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quick-option-btn { background: white; color: #6c5ce7; border: none; padding: 12px; border-radius: 10px; cursor: pointer; text-align: left; font-size: 14px; }
+        .quick-option-btn:hover { background: #f0ebff; }
+        .quick-option-btn.correct { background: #d4edda; color: #155724; }
+        .quick-option-btn.wrong { background: #f8d7da; color: #c0392b; }
+        .quiz-result { text-align: center; font-size: 20px; margin-top: 20px; }
+
+        /* === REFLEKTERANDE FRÅGOR === */
+        .reflection-section { background: #f8f5ff; border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .reflection-section h3 { color: #6c5ce7; margin-bottom: 20px; }
+        .reflection-open { margin-bottom: 20px; }
+        .reflection-open label { display: block; font-weight: bold; margin-bottom: 8px; color: #2d3436; }
+        .reflection-textarea { width: 100%; min-height: 80px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-family: inherit; font-size: 14px; resize: vertical; }
+        .reflection-textarea:focus { border-color: #6c5ce7; outline: none; }
+        .save-reflections-btn { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; cursor: pointer; }
+        .reflection-thanks { display: none; background: #d4edda; padding: 15px; border-radius: 12px; text-align: center; margin-top: 15px; color: #155724; }
+
+        .pause-modal {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .pause-modal.show { display: flex; }
+        .pause-content { background: white; padding: 40px; border-radius: 20px; text-align: center; }
+        .continue-btn {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white; border: none; padding: 15px 40px; border-radius: 25px; font-size: 18px; cursor: pointer;
+        }
+        .text-size-controls { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 5px; }
+        .size-btn {
+            width: 40px; height: 40px; border: 2px solid #ddd; border-radius: 50%;
+            background: white; cursor: pointer; font-size: 16px;
+        }
+
+        /* === STICKY NOTES HÖGERMARGINALEN === */
+        .sticky-sidebar {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 190px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sticky-note {
+            border-radius: 5px;
+            padding: 16px 14px;
+            box-shadow:
+                3px 3px 10px rgba(0,0,0,0.1),
+                0 0 0 1px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .sticky-note::before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 15px;
+            border-radius: 2px;
+        }
+
+        .sticky-note-yellow {
+            background: #fffacd;
+            transform: rotate(-2deg);
+        }
+
+        .sticky-note-yellow::before {
+            background: rgba(200, 180, 140, 0.6);
+        }
+
+        .sticky-note-pink {
+            background: #ffe4ec;
+            transform: rotate(2deg);
+        }
+
+        .sticky-note-pink::before {
+            background: rgba(200, 150, 170, 0.6);
+        }
+
+        .sticky-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sticky-note-yellow .sticky-title {
+            color: #7a6a4a;
+        }
+
+        .sticky-note-pink .sticky-title {
+            color: #7a4a5a;
+        }
+
+        .sticky-list {
+            list-style: none;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .sticky-note-yellow .sticky-list {
+            color: #6a5a3a;
+        }
+
+        .sticky-note-pink .sticky-list {
+            color: #6a3a4a;
+        }
+
+        .sticky-list li {
+            padding: 3px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .sticky-color-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            top: 7px;
+        }
+
+        .sticky-note-pink .sticky-list li::before {
+            content: "\01F4A1";
+            position: absolute;
+            left: 0;
+            font-size: 9px;
+        }
+
+        @media (max-width: 1200px) {
+            .sticky-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY NOTES HÖGERMARGINALEN -->
+    <aside class="sticky-sidebar">
+        <div class="sticky-note sticky-note-yellow">
+            <div class="sticky-title">Så här fungerar färgerna</div>
+            <ul class="sticky-list">
+                <li><span class="sticky-color-dot" style="background:#74b9ff"></span> Blå = Viktiga begrepp</li>
+                <li><span class="sticky-color-dot" style="background:#a8e6cf"></span> Grön = Fakta att komma ihåg</li>
+                <li><span class="sticky-color-dot" style="background:#ffcccc"></span> Röd = Förväxla inte!</li>
+                <li><span class="sticky-color-dot" style="background:#ffeaa7"></span> Gul = Visste du att...</li>
+            </ul>
+        </div>
+        <div class="sticky-note sticky-note-pink">
+            <div class="sticky-title">Tips till Esther</div>
+            <ul class="sticky-list">
+                <li>Ha papper och penna bredvid dig</li>
+                <li>Läs instruktionerna klart först</li>
+                <li>Ta paus var 20:e minut</li>
+                <li>Det är okej att göra fel!</li>
+            </ul>
+        </div>
+    </aside>
+
+    <div class="layout">
+        <nav class="sidebar">
+            <h3>Del 1: Bränslen och kol</h3>
+            <a href="del1-sida01.html" class="nav-link">1. Vad är bränsle?</a>
+            <a href="del1-sida02.html" class="nav-link">2. Grundämnet kol</a>
+            <a href="del1-sida03.html" class="nav-link">3. Kol i allt levande</a>
+            <a href="del1-sida04.html" class="nav-link">4. Kolets kretslopp</a>
+            <a href="del1-sida05.html" class="nav-link">5. Fotosyntes</a>
+            <a href="del1-sida06.html" class="nav-link">6. Cellandning</a>
+            <a href="del1-sida07.html" class="nav-link">7. Allt hänger ihop</a>
+            <a href="del1-sida08.html" class="nav-link">8. Nedbrytare</a>
+            <a href="del1-sida09.html" class="nav-link current">9. Sammanfattning</a>
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                <div style="font-size: 12px; color: #888; margin-bottom: 8px;">DEL 2</div>
+                <a href="del2-sida10.html" class="nav-link">10. Fossila bränslen</a>
+            </div>
+            <div style="margin-top: 30px;">
+                <a href="index.html" class="nav-link" style="color: #6c5ce7;">← Tillbaka till start</a>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="top-bar">
+                <div class="progress-indicator">Sida 9 av 23 • Del 1 klar!</div>
+                <div class="top-right">
+                    <div class="points-display">⭐ <span id="totalPoints">0</span> poäng</div>
+                    <button class="pause-btn" onclick="showPause()">Jag behöver en paus</button>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <!-- STÄNG AV SKÄRMEN UTMANING -->
+                <div class="screen-off-challenge" id="screenOffChallenge">
+                    <h3>Utmaning innan du läser!</h3>
+                    <p>Stäng av skärmen (eller titta bort) och försök säga <strong>tre saker</strong> du lärt dig i Del 1.</p>
+                    <p style="font-size: 14px; color: #888;">Ta dig tid - det är okej om du inte kommer på allt!</p>
+                    <button class="challenge-btn" onclick="completeScreenOff()">Jag har försökt</button>
+                </div>
+                <div class="screen-off-done" id="screenOffDone" style="display: none;">
+                    <p><strong>Bra jobbat!</strong> Att försöka minnas utan att titta hjälper ditt minne att bli starkare.</p>
+                </div>
+
+                <div class="celebration">
+                    <h2>Del 1 avklarad!</h2>
+                    <p>Bra jobbat, Esther! Du har lärt dig grunderna om kol och kretsloppet.</p>
+                </div>
+
+                <h1 class="page-title">Sammanfattning: Bränslen och kol</h1>
+
+                <div class="summary-box">
+                    <h3>Det här har du lärt dig:</h3>
+                    <div class="summary-item">
+                        <span class="summary-icon">1</span>
+                        <span><strong>Bränsle</strong> = ämne man får ut energi ur. Exempel: bensin, diesel, olja.</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-icon">2</span>
+                        <span><strong>Kol (C)</strong> = grundämne som finns i allt levande och i de flesta bränslen.</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-icon">3</span>
+                        <span><strong>Kolets kretslopp</strong> = kolatomer vandrar mellan luft, växter, djur och nedbrytare.</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-icon">4</span>
+                        <span><strong>Fotosyntes</strong> = växter tar in koldioxid och gör druvsocker + syre.</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-icon">5</span>
+                        <span><strong>Cellandning</strong> = djur använder druvsocker + syre för att få energi.</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-icon">6</span>
+                        <span><strong>Nedbrytare</strong> = bryter ner döda växter och djur, släpper ut koldioxid.</span>
+                    </div>
+                </div>
+
+                <!-- SKRIV PÅ PAPPER -->
+                <div class="paper-prompt" id="paperPrompt">
+                    <h4>Tips: Skriv ner!</h4>
+                    <p>Ta fram papper och skriv ner de <strong>tre viktigaste begreppen</strong> från denna del.</p>
+                    <button class="paper-btn" onclick="completePaper()">Jag har skrivit</button>
+                    <div class="paper-done" id="paperDone">Bra! Att skriva för hand hjälper dig att minnas bättre.</div>
+                </div>
+
+                <!-- FÖRHÖR DIG SJÄLV -->
+                <div class="self-quiz">
+                    <h3>Förhör dig själv</h3>
+                    <p class="self-quiz-note">Försök svara utan att scrolla upp! Skriv vad du tror, sen kan du kolla.</p>
+
+                    <div class="quiz-item">
+                        <p class="quiz-question-text">Vad är fotosyntes?</p>
+                        <input type="text" class="quiz-input" placeholder="Skriv ditt svar...">
+                        <button class="reveal-btn" onclick="revealAnswer(this)">Visa svar</button>
+                        <div class="quiz-answer">Fotosyntes är när växter använder koldioxid, vatten och solenergi för att skapa druvsocker och syre.</div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="quiz-question-text">Vad är cellandning?</p>
+                        <input type="text" class="quiz-input" placeholder="Skriv ditt svar...">
+                        <button class="reveal-btn" onclick="revealAnswer(this)">Visa svar</button>
+                        <div class="quiz-answer">Cellandning är när djurets celler omvandlar druvsocker och syre till energi, koldioxid och vatten.</div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="quiz-question-text">Ge ett exempel på en nedbrytare.</p>
+                        <input type="text" class="quiz-input" placeholder="Skriv ditt svar...">
+                        <button class="reveal-btn" onclick="revealAnswer(this)">Visa svar</button>
+                        <div class="quiz-answer">Exempel: svampar, maskar, bakterier - de bryter ner döda växter och djur.</div>
+                    </div>
+                </div>
+
+                <!-- SNABBQUIZ -->
+                <div class="quick-quiz-section">
+                    <h3>Snabbquiz!</h3>
+                    <p>Testa vad du kommer ihåg - hur snabbt kan du svara rätt?</p>
+                    <button class="start-quiz-btn" onclick="startQuickQuiz()">Starta quiz</button>
+
+                    <div class="quick-quiz-content" id="quickQuizContent">
+                        <div class="timer-display">Tid: <span id="quizTimer">0</span>s</div>
+                        <div id="quizQuestions"></div>
+                        <div class="quiz-result" id="quizResult"></div>
+                    </div>
+                </div>
+
+                <!-- REFLEKTERANDE FRÅGOR -->
+                <div class="reflection-section">
+                    <h3>Reflektera</h3>
+                    <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Inga rätt eller fel här - skriv fritt vad du tänker!</p>
+
+                    <div class="reflection-open">
+                        <label>Vad tyckte du var mest intressant i denna del?</label>
+                        <textarea class="reflection-textarea" id="reflectInterest" placeholder="Skriv fritt..."></textarea>
+                    </div>
+
+                    <div class="reflection-open">
+                        <label>Vad fastnade hos dig?</label>
+                        <textarea class="reflection-textarea" id="reflectStuck" placeholder="Skriv fritt..."></textarea>
+                    </div>
+
+                    <div class="reflection-open">
+                        <label>Finns det något du vill veta mer om?</label>
+                        <textarea class="reflection-textarea" id="reflectMore" placeholder="Skriv fritt..."></textarea>
+                    </div>
+
+                    <div class="reflection-open">
+                        <label>Hur hänger detta ihop med något du redan visste?</label>
+                        <textarea class="reflection-textarea" id="reflectConnect" placeholder="Skriv fritt..."></textarea>
+                    </div>
+
+                    <button class="save-reflections-btn" onclick="saveReflections()">Spara reflektioner</button>
+                    <div class="reflection-thanks" id="reflectionThanks">Tack för din reflektion!</div>
+                </div>
+
+                <div class="continue-section">
+                    <p style="margin-bottom: 15px; color: #666;">Nästa del handlar om <strong>fossila bränslen</strong> - varifrån kommer oljan?</p>
+                    <a href="del2-sida10.html" class="continue-btn-main" id="continueBtn">Fortsätt till Del 2 →</a>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="del1-sida08.html" class="nav-btn prev">← Föregående</a>
+                <a href="index.html" class="nav-btn prev">Tillbaka till översikt</a>
+            </div>
+        </main>
+    </div>
+
+    <div class="pause-modal" id="pauseModal">
+        <div class="pause-content">
+            <h2>Bra jobbat!</h2>
+            <p>Du har klarat Del 1! Ta en ordentlig paus innan du fortsätter med Del 2.</p>
+            <button class="continue-btn" onclick="hidePause()">Okej!</button>
+        </div>
+    </div>
+
+    <div class="text-size-controls">
+        <button class="size-btn" onclick="changeSize(-2)">A-</button>
+        <button class="size-btn" onclick="changeSize(2)">A+</button>
+    </div>
+
+    <script>
+        const pageData = {
+            pageId: 'del1-sida09.html',
+            startTime: Date.now(),
+            reflections: {}
+        };
+
+        function loadPoints() {
+            const points = localStorage.getItem('esther-no-kap4-points');
+            document.getElementById('totalPoints').textContent = points ? points : '0';
+        }
+        loadPoints();
+
+        // === LÄRANDE SOM STANNAR ===
+        function completeScreenOff() {
+            document.getElementById('screenOffChallenge').style.display = 'none';
+            document.getElementById('screenOffDone').style.display = 'block';
+            localStorage.setItem('esther-no-kap4-del1-screenoff', 'done');
+        }
+
+        function completePaper() {
+            document.getElementById('paperDone').style.display = 'block';
+            document.querySelector('.paper-btn').style.display = 'none';
+            localStorage.setItem('esther-no-kap4-del1-paper', 'done');
+        }
+
+        function revealAnswer(btn) {
+            const answerDiv = btn.nextElementSibling;
+            answerDiv.classList.add('show');
+            btn.style.display = 'none';
+        }
+
+        // === SNABBQUIZ ===
+        const quizQuestions = [
+            { q: "Vad kallas det när växter gör druvsocker av koldioxid och solljus?", options: ["Cellandning", "Fotosyntes", "Nedbrytning"], correct: 1 },
+            { q: "Vad behöver djur för att få energi från druvsocker?", options: ["Koldioxid", "Syre", "Solenergi"], correct: 1 },
+            { q: "Vilka bryter ner döda växter och djur?", options: ["Växter", "Nedbrytare", "Fiskar"], correct: 1 },
+            { q: "Vad släpper nedbrytare ut till luften?", options: ["Syre", "Druvsocker", "Koldioxid"], correct: 2 }
+        ];
+        let quizTimer = 0;
+        let timerInterval;
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+
+        function startQuickQuiz() {
+            document.getElementById('quickQuizContent').style.display = 'block';
+            document.querySelector('.start-quiz-btn').style.display = 'none';
+            currentQuestion = 0;
+            correctAnswers = 0;
+            quizTimer = 0;
+            timerInterval = setInterval(() => {
+                quizTimer++;
+                document.getElementById('quizTimer').textContent = quizTimer;
+            }, 1000);
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            if (currentQuestion >= quizQuestions.length) {
+                endQuiz();
+                return;
+            }
+            const q = quizQuestions[currentQuestion];
+            let html = '<div class="quick-quiz-question">';
+            html += '<p style="margin-bottom: 10px;"><strong>' + q.q + '</strong></p>';
+            html += '<div class="quick-quiz-options">';
+            q.options.forEach((opt, i) => {
+                html += '<button class="quick-option-btn" onclick="answerQuiz(' + i + ')">' + opt + '</button>';
+            });
+            html += '</div></div>';
+            document.getElementById('quizQuestions').innerHTML = html;
+        }
+
+        function answerQuiz(index) {
+            const q = quizQuestions[currentQuestion];
+            const buttons = document.querySelectorAll('.quick-option-btn');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) btn.classList.add('correct');
+                if (i === index && i !== q.correct) btn.classList.add('wrong');
+            });
+            if (index === q.correct) correctAnswers++;
+            setTimeout(() => {
+                currentQuestion++;
+                showQuizQuestion();
+            }, 1000);
+        }
+
+        function endQuiz() {
+            clearInterval(timerInterval);
+            document.getElementById('quizQuestions').innerHTML = '';
+            const result = document.getElementById('quizResult');
+            result.innerHTML = '<strong>' + correctAnswers + '/' + quizQuestions.length + ' rätt!</strong><br>Tid: ' + quizTimer + ' sekunder';
+            if (correctAnswers === quizQuestions.length) {
+                result.innerHTML += '<br>Perfekt!';
+            }
+        }
+
+        // === REFLEKTERANDE FRÅGOR ===
+        function saveReflections() {
+            const reflections = {
+                interest: document.getElementById('reflectInterest').value,
+                stuck: document.getElementById('reflectStuck').value,
+                more: document.getElementById('reflectMore').value,
+                connect: document.getElementById('reflectConnect').value,
+                timestamp: new Date().toISOString()
+            };
+
+            const allReflections = JSON.parse(localStorage.getItem('esther-no-kap4-reflections') || '{}');
+            allReflections['del1'] = reflections;
+            localStorage.setItem('esther-no-kap4-reflections', JSON.stringify(allReflections));
+
+            document.getElementById('reflectionThanks').style.display = 'block';
+            markCompleted();
+        }
+
+        // Ladda sparade reflektioner
+        function loadSavedReflections() {
+            const allReflections = JSON.parse(localStorage.getItem('esther-no-kap4-reflections') || '{}');
+            const del1 = allReflections['del1'];
+            if (del1) {
+                if (del1.interest) document.getElementById('reflectInterest').value = del1.interest;
+                if (del1.stuck) document.getElementById('reflectStuck').value = del1.stuck;
+                if (del1.more) document.getElementById('reflectMore').value = del1.more;
+                if (del1.connect) document.getElementById('reflectConnect').value = del1.connect;
+            }
+
+            // Ladda andra sparade tillstånd
+            if (localStorage.getItem('esther-no-kap4-del1-screenoff') === 'done') {
+                document.getElementById('screenOffChallenge').style.display = 'none';
+                document.getElementById('screenOffDone').style.display = 'block';
+            }
+            if (localStorage.getItem('esther-no-kap4-del1-paper') === 'done') {
+                document.getElementById('paperDone').style.display = 'block';
+                document.querySelector('.paper-btn').style.display = 'none';
+            }
+        }
+        loadSavedReflections();
+
+        function markCompleted() {
+            const progress = JSON.parse(localStorage.getItem('esther-no-kap4-progress') || '{}');
+            progress[pageData.pageId] = 'completed';
+            localStorage.setItem('esther-no-kap4-progress', JSON.stringify(progress));
+        }
+
+        // Markera direkt som klar (sammanfattningssida)
+        markCompleted();
+
+        function showPause() { document.getElementById('pauseModal').classList.add('show'); }
+        function hidePause() { document.getElementById('pauseModal').classList.remove('show'); }
+        function changeSize(delta) {
+            const currentSize = parseInt(window.getComputedStyle(document.body).fontSize);
+            document.body.style.fontSize = (currentSize + delta) + 'px';
+        }
+
+        function updateSidebar() {
+            const progress = JSON.parse(localStorage.getItem('esther-no-kap4-progress') || '{}');
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (progress[href] === 'completed') link.classList.add('completed');
+            });
+        }
+        updateSidebar();
+    </script>
+</body>
+</html>

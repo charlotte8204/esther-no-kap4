@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bränslen och klimat - Esther</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Verdana, Geneva, sans-serif;
+            font-size: 18px;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #f5f0ff 0%, #e8f5e9 100%);
+            min-height: 100vh;
+            color: #2d3436;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .welcome-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .welcome-card h1 {
+            color: #6c5ce7;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .welcome-card p {
+            color: #636e72;
+            font-size: 18px;
+        }
+
+        .color-guide {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .color-guide h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .color-dot.blue { background: #74b9ff; }
+        .color-dot.green { background: #a8e6cf; }
+        .color-dot.red { background: #ffcccc; }
+        .color-dot.yellow { background: #ffeaa7; }
+
+        .progress-overview {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .progress-bar-container {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #a8e6cf, #81ecec);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #6c5ce7;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #636e72;
+        }
+
+        .parts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .part-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .part-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .part-title {
+            font-size: 20px;
+            color: #2d3436;
+        }
+
+        .part-progress {
+            font-size: 14px;
+            color: #636e72;
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .page-link:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .page-link.not-started {
+            background: #f0f0f0;
+            color: #636e72;
+            border: 2px solid #ddd;
+        }
+
+        .page-link.completed {
+            background: #a8e6cf;
+            color: #00695c;
+            border: 2px solid #81c784;
+        }
+
+        .page-link.skipped {
+            background: #ffeaa7;
+            color: #856404;
+            border: 2px solid #f9ca24;
+        }
+
+        .page-link.current {
+            background: #74b9ff;
+            color: white;
+            border: 2px solid #0984e3;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+        }
+
+        .start-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+        }
+
+        .tips-card {
+            background: #fff9e6;
+            border: 2px solid #ffeaa7;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .tips-card h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .tips-card ul {
+            margin-left: 20px;
+        }
+
+        .tips-card li {
+            margin-bottom: 8px;
+            color: #5d4e37;
+        }
+
+        /* === STICKY NOTES HÖGERMARGINALEN === */
+        .sticky-sidebar {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 190px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sticky-note {
+            border-radius: 5px;
+            padding: 16px 14px;
+            box-shadow:
+                3px 3px 10px rgba(0,0,0,0.1),
+                0 0 0 1px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .sticky-note::before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 15px;
+            border-radius: 2px;
+        }
+
+        .sticky-note-yellow {
+            background: #fffacd;
+            transform: rotate(-2deg);
+        }
+
+        .sticky-note-yellow::before {
+            background: rgba(200, 180, 140, 0.6);
+        }
+
+        .sticky-note-pink {
+            background: #ffe4ec;
+            transform: rotate(2deg);
+        }
+
+        .sticky-note-pink::before {
+            background: rgba(200, 150, 170, 0.6);
+        }
+
+        .sticky-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sticky-note-yellow .sticky-title {
+            color: #7a6a4a;
+        }
+
+        .sticky-note-pink .sticky-title {
+            color: #7a4a5a;
+        }
+
+        .sticky-list {
+            list-style: none;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .sticky-note-yellow .sticky-list {
+            color: #6a5a3a;
+        }
+
+        .sticky-note-pink .sticky-list {
+            color: #6a3a4a;
+        }
+
+        .sticky-list li {
+            padding: 3px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .sticky-color-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            top: 7px;
+        }
+
+        .sticky-note-pink .sticky-list li::before {
+            content: "\01F4A1";
+            position: absolute;
+            left: 0;
+            font-size: 9px;
+        }
+
+        @media (max-width: 1200px) {
+            .sticky-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY NOTES HÖGERMARGINALEN -->
+    <aside class="sticky-sidebar">
+        <div class="sticky-note sticky-note-yellow">
+            <div class="sticky-title">Så här fungerar färgerna</div>
+            <ul class="sticky-list">
+                <li><span class="sticky-color-dot" style="background:#74b9ff"></span> Blå = Viktiga begrepp</li>
+                <li><span class="sticky-color-dot" style="background:#a8e6cf"></span> Grön = Fakta att komma ihåg</li>
+                <li><span class="sticky-color-dot" style="background:#ffcccc"></span> Röd = Förväxla inte!</li>
+                <li><span class="sticky-color-dot" style="background:#ffeaa7"></span> Gul = Visste du att...</li>
+            </ul>
+        </div>
+        <div class="sticky-note sticky-note-pink">
+            <div class="sticky-title">Tips till Esther</div>
+            <ul class="sticky-list">
+                <li>Ha papper och penna bredvid dig</li>
+                <li>Läs instruktionerna klart först</li>
+                <li>Ta paus var 20:e minut</li>
+                <li>Det är okej att göra fel!</li>
+            </ul>
+        </div>
+    </aside>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h1>Hej Esther!</h1>
+            <p>Välkommen till kapitlet om <strong>Bränslen och klimat</strong></p>
+            <p style="margin-top: 10px; font-size: 16px; color: #888;">23 korta sidor med interaktiva uppgifter</p>
+            <a href="del1-sida01.html" class="start-btn" id="startBtn">Börja här</a>
+        </div>
+
+        <div class="color-guide">
+            <h3>Så här fungerar färgerna:</h3>
+            <div class="color-item">
+                <div class="color-dot blue"></div>
+                <span><strong>Blå</strong> = Viktiga begrepp och ord</span>
+            </div>
+            <div class="color-item">
+                <div class="color-dot green"></div>
+                <span><strong>Grön</strong> = Viktiga fakta att komma ihåg</span>
+            </div>
+            <div class="color-item">
+                <div class="color-dot red"></div>
+                <span><strong>Röd</strong> = Varning! Förväxla inte</span>
+            </div>
+            <div class="color-item">
+                <div class="color-dot yellow"></div>
+                <span><strong>Gul</strong> = Intressant "visste du att"</span>
+            </div>
+        </div>
+
+        <div class="progress-overview">
+            <h3>Din progress</h3>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-number" id="completedCount">0</div>
+                    <div class="stat-label">Avklarade</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPoints">0</div>
+                    <div class="stat-label">Poäng</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="skippedCount">0</div>
+                    <div class="stat-label">Överhoppade</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="parts-container">
+            <!-- DEL 1 -->
+            <div class="part-card">
+                <div class="part-header">
+                    <span class="part-title">Del 1: Bränslen och kol</span>
+                    <span class="part-progress" id="part1Progress">0/9</span>
+                </div>
+                <p style="color: #636e72; font-size: 16px; margin-bottom: 10px;">Vad är bränsle? Vad är kol? Hur vandrar kolet runt?</p>
+                <div class="pages-grid" id="part1Pages">
+                    <!-- Genereras av JavaScript -->
+                </div>
+            </div>
+
+            <!-- DEL 2 -->
+            <div class="part-card">
+                <div class="part-header">
+                    <span class="part-title">Del 2: Fossila bränslen</span>
+                    <span class="part-progress" id="part2Progress">0/6</span>
+                </div>
+                <p style="color: #636e72; font-size: 16px; margin-bottom: 10px;">Hur bildas olja, gas och kol? Vad används de till?</p>
+                <div class="pages-grid" id="part2Pages">
+                    <!-- Genereras av JavaScript -->
+                </div>
+            </div>
+
+            <!-- DEL 3 -->
+            <div class="part-card">
+                <div class="part-header">
+                    <span class="part-title">Del 3: Klimatpåverkan</span>
+                    <span class="part-progress" id="part3Progress">0/8</span>
+                </div>
+                <p style="color: #636e72; font-size: 16px; margin-bottom: 10px;">Hur påverkar bränslen klimatet? Vad är växthuseffekten?</p>
+                <div class="pages-grid" id="part3Pages">
+                    <!-- Genereras av JavaScript -->
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #f0f0f0; border: 2px solid #ddd;"></div>
+                    <span>Ej påbörjad</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #a8e6cf; border: 2px solid #81c784;"></div>
+                    <span>Klar</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #ffeaa7; border: 2px solid #f9ca24;"></div>
+                    <span>Överhoppad</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tips-card">
+            <h3>Tips för dig, Esther:</h3>
+            <ul>
+                <li>Du kan <strong>hoppa över</strong> en uppgift om du fastnar - kom tillbaka senare!</li>
+                <li>Klicka på <strong>blå ord</strong> för att se förklaringar</li>
+                <li>Ta en <strong>paus</strong> när du behöver - knappen finns alltid uppe till höger</li>
+                <li>Varje sida tar bara 30-45 sekunder</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+            <a href="esther-no-kap4-summary.html" style="color: #999; font-size: 13px; text-decoration: none;">📊 Statistik</a>
+        </div>
+    </div>
+
+    <script>
+        // Sidstruktur
+        const pages = {
+            part1: [
+                { num: 1, file: 'del1-sida01.html', title: 'Vad är bränsle?' },
+                { num: 2, file: 'del1-sida02.html', title: 'Grundämnet kol' },
+                { num: 3, file: 'del1-sida03.html', title: 'Kol i allt levande' },
+                { num: 4, file: 'del1-sida04.html', title: 'Kolets kretslopp' },
+                { num: 5, file: 'del1-sida05.html', title: 'Fotosyntes' },
+                { num: 6, file: 'del1-sida06.html', title: 'Cellandning' },
+                { num: 7, file: 'del1-sida07.html', title: 'Allt hänger ihop' },
+                { num: 8, file: 'del1-sida08.html', title: 'Nedbrytare' },
+                { num: 9, file: 'del1-sida09.html', title: 'Sammanfattning' }
+            ],
+            part2: [
+                { num: 10, file: 'del2-sida10.html', title: 'Fossila bränslen bildas' },
+                { num: 11, file: 'del2-sida11.html', title: 'Olja, gas och kol' },
+                { num: 12, file: 'del2-sida12.html', title: 'Vad används de till?' },
+                { num: 13, file: 'del2-sida13.html', title: 'Var finns de?' },
+                { num: 14, file: 'del2-sida14.html', title: 'Hur tar vi upp dem?' },
+                { num: 15, file: 'del2-sida15.html', title: 'Sammanfattning' }
+            ],
+            part3: [
+                { num: 16, file: 'del3-sida16.html', title: 'Förbränning' },
+                { num: 17, file: 'del3-sida17.html', title: 'Obalans' },
+                { num: 18, file: 'del3-sida18.html', title: 'Växthuseffekten' },
+                { num: 19, file: 'del3-sida19.html', title: 'Förstärkt växthuseffekt' },
+                { num: 20, file: 'del3-sida20.html', title: 'Konsekvenser' },
+                { num: 21, file: 'del3-sida21.html', title: 'Tar bränslen slut?' },
+                { num: 22, file: 'del3-sida22.html', title: 'Slutsammanfattning' },
+                { num: 23, file: 'del3-sida23.html', title: 'Reflektion' }
+            ]
+        };
+
+        // Hämta progress från localStorage
+        function getProgress() {
+            const saved = localStorage.getItem('esther-no-kap4-progress');
+            return saved ? JSON.parse(saved) : {};
+        }
+
+        // Rendera sidor för en del
+        function renderPages(containerId, pageList) {
+            const container = document.getElementById(containerId);
+            const progress = getProgress();
+
+            pageList.forEach(page => {
+                const link = document.createElement('a');
+                link.href = page.file;
+                link.className = 'page-link';
+                link.textContent = page.num;
+                link.title = page.title;
+
+                const status = progress[page.file];
+                if (status === 'completed') {
+                    link.classList.add('completed');
+                } else if (status === 'skipped') {
+                    link.classList.add('skipped');
+                } else {
+                    link.classList.add('not-started');
+                }
+
+                container.appendChild(link);
+            });
+        }
+
+        // Beräkna statistik
+        function updateStats() {
+            const progress = getProgress();
+            const allPages = [...pages.part1, ...pages.part2, ...pages.part3];
+
+            let completed = 0;
+            let skipped = 0;
+            let totalPoints = 0;
+
+            allPages.forEach(page => {
+                if (progress[page.file] === 'completed') completed++;
+                if (progress[page.file] === 'skipped') skipped++;
+            });
+
+            // Hämta poäng
+            const points = localStorage.getItem('esther-no-kap4-points');
+            totalPoints = points ? parseInt(points) : 0;
+
+            // Uppdatera UI
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('skippedCount').textContent = skipped;
+            document.getElementById('totalPoints').textContent = totalPoints;
+
+            const progressPercent = (completed / allPages.length) * 100;
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+
+            // Uppdatera del-progress
+            const part1Completed = pages.part1.filter(p => progress[p.file] === 'completed').length;
+            const part2Completed = pages.part2.filter(p => progress[p.file] === 'completed').length;
+            const part3Completed = pages.part3.filter(p => progress[p.file] === 'completed').length;
+
+            document.getElementById('part1Progress').textContent = `${part1Completed}/${pages.part1.length}`;
+            document.getElementById('part2Progress').textContent = `${part2Completed}/${pages.part2.length}`;
+            document.getElementById('part3Progress').textContent = `${part3Completed}/${pages.part3.length}`;
+
+            // Hitta nästa sida att fortsätta på
+            const nextPage = allPages.find(p => !progress[p.file] || progress[p.file] === 'skipped');
+            if (nextPage && completed > 0) {
+                document.getElementById('startBtn').textContent = 'Fortsätt';
+                document.getElementById('startBtn').href = nextPage.file;
+            }
+        }
+
+        // Init
+        renderPages('part1Pages', pages.part1);
+        renderPages('part2Pages', pages.part2);
+        renderPages('part3Pages', pages.part3);
+        updateStats();
+    </script>
+</body>
+</html>
